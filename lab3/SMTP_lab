@@ -1,0 +1,91 @@
+from socket import *
+msg = "\r\n hello ftg from zzy"
+endmsg = "\r\n.\r\n"
+
+
+mailserver ='smtp.163.com'
+serverPort = 25
+clientSocket=socket(AF_INET,SOCK_STREAM)
+clientSocket.connect((mailserver,serverPort))
+
+#clientSocket.send(msg.encode())
+recv = clientSocket.recv(1024).decode()
+print(recv)
+if recv[:3] != '220':
+    print('220 reply not received from server')
+    
+heloCommand = 'HELO 163.com\r\n'
+clientSocket.send(heloCommand.encode())
+recv1 = clientSocket.recv(1024).decode()    #number 1
+print(recv1)
+if recv1[:3] != '250':
+    print('250 reply not received from server.')
+
+
+authCommand = 'auth login\r\n'
+clientSocket.send(authCommand.encode())
+recvp1 = clientSocket.recv(1024).decode()    
+print(recvp1)
+if recvp1[:3] != '334':
+    print('334 reply not received from server.')
+
+
+nameCommand = '******\r\n'                #****** is mail name in base 64
+clientSocket.send(nameCommand.encode())
+recvp2 = clientSocket.recv(1024).decode()    
+print(recvp2)
+if recvp2[:3] != '334':
+    print('334 reply not received from server.')
+
+
+passwordCommand = '************\r\n'       #****** is mail sever Authorization password in base 64
+clientSocket.send(passwordCommand.encode())
+recvp3 = clientSocket.recv(1024).decode()    
+print(recvp3)
+if recvp3[:3] != '235':
+    print('235 reply not received from server.')
+
+MailFromCommand = 'MAIL FROM: <******@163.com>\r\n'  #send email name
+clientSocket.send(MailFromCommand.encode())
+recv2 = clientSocket.recv(1024).decode()    
+print(recv2)
+if recv2[:3] != '250':
+    print('250 reply not received from server.')
+
+RcptToCommand = 'RCPT TO: <*******@qq.com>\r\n'     #receive email name
+clientSocket.send(RcptToCommand.encode())
+recv3 = clientSocket.recv(1024).decode()   
+print(recv3)
+if recv3[:3] != '250':
+    print('250 reply not received from server.')
+
+DataCommand = 'DATA\r\n'
+clientSocket.send(DataCommand.encode())
+recv4 = clientSocket.recv(1024).decode()    
+print(recv4)
+if recv4[:3] != '354':
+    print('354 reply not received from server.')
+
+subjectCommand = 'subject:helloftg\r\n'          #mail title
+clientSocket.send(subjectCommand.encode())
+#recvp4 = clientSocket.recv(1024).decode()    
+#print(recvp4)
+#if recvp4[:3] != '354':
+#    print('354 reply not received from server.')
+
+
+
+clientSocket.send(msg.encode())
+clientSocket.send(endmsg.encode())
+recv5 = clientSocket.recv(1024).decode()    
+print(recv5)
+if recv5[:3] != '250':
+    print('250 reply not received from server.')
+
+QuitCommand = 'QUIT\r\n'
+clientSocket.send(QuitCommand.encode())
+recv6 = clientSocket.recv(1024).decode()    
+print(recv6)
+if recv6[:3] != '221':
+    print('221 reply not received from server.')
+
